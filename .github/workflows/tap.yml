@@ -1,0 +1,30 @@
+name: Validate Homebrew cask
+on:
+  push:
+    branches: [main]
+    paths: ["Casks/**", "tests/**", ".github/workflows/tap.yml"]
+  pull_request:
+    paths: ["Casks/**", "tests/**", ".github/workflows/tap.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  cask:
+    runs-on: macos-15
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Check Ruby syntax and architecture contract
+        run: |
+          ruby -c Casks/entropy.rb
+          ruby tests/cask_contract.rb
+      - name: Load the checked-out tap
+        run: brew tap D19ital/entropy "$GITHUB_WORKSPACE"
+      - name: Check cask style
+        run: brew style --cask D19ital/entropy/entropy
+      - name: Read cask through Homebrew
+        run: brew info --cask D19ital/entropy/entropy
+      - name: Fetch and verify release DMG
+        run: brew fetch --cask D19ital/entropy/entropy
