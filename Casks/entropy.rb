@@ -10,5 +10,7 @@ cask "entropy" do
   desc "Ergohaven keyboard configurator"
   homepage "https://github.com/ergohaven/entropy"
 
+  depends_on :macos
+
   app "Entropy.app"
 end

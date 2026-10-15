@@ -25,6 +25,10 @@ class Definition
     @values[:sha256] = options.fetch(@cpu)
   end
 
+  def depends_on(value)
+    @values[:depends_on] = value
+  end
+
   [:url, :name, :desc, :homepage, :app].each do |field|
     define_method(field) { |value| @values[field] = value }
   end
@@ -39,6 +43,7 @@ path = File.expand_path("../Casks/entropy.rb", __dir__)
   expected = "https://github.com/ergohaven/entropy/releases/download/v#{values[:version]}/entropy-v#{values[:version]}-macos-#{architecture}.dmg"
   raise "Wrong release URL" unless values[:url] == expected
   raise "Invalid SHA256" unless /\A[0-9a-f]{64}\z/.match?(values.fetch(:sha256))
+  raise "Missing macOS restriction" unless values[:depends_on] == :macos
   raise "Wrong app artifact" unless values[:app] == "Entropy.app"
   raise "Wrong homepage" unless values[:homepage] == "https://github.com/ergohaven/entropy"
   puts "PASS #{architecture}: pinned release URL, SHA256 format, app and homepage"
